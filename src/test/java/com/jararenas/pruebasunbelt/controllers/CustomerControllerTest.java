@@ -93,40 +93,7 @@ class CustomerControllerTest {
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
 	
-	@Test
-	void testGetCustomerByDocument() {
-		ResponseEntity<Response> response;
-		Customer customer = new Customer();
-		response = customerController.getCustomerByDoc(customer);
-		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-		/*************************************caso de prueba*****************************************/
-		customer.setTypeDoc("c");
-		customer.setDocument("10121314");
-		response = customerController.getCustomerByDoc(customer);
-		Assertions.assertEquals("OK", response.getBody().getResponse());
-		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-		/*************************************caso de prueba*****************************************/
-		customer.setTypeDoc("t");
-		response = customerController.getCustomerByDoc(customer);
-		Assertions.assertEquals("El tipo de documento ingresado no es valido", response.getBody().getResponse());
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		/*************************************caso de prueba*****************************************/
-		customer.setTypeDoc("p");
-		response = customerController.getCustomerByDoc(customer);
-		Assertions.assertEquals("No se encontraron clientes con los datos proporcionados", response.getBody().getResponse());
-		Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		/*************************************caso de prueba*****************************************/
-		customer.setTypeDoc("");
-		response = customerController.getCustomerByDoc(customer);
-		Assertions.assertEquals("Los datos de consulta no estan completos", response.getBody().getResponse());
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		/*************************************caso de prueba*****************************************/
-		customer.setDocument("");
-		response = customerController.getCustomerByDoc(customer);
-		Assertions.assertEquals("Los datos de consulta no estan completos", response.getBody().getResponse());
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		
-	}
+	
 	
 	@Test
 	void testTesting() {

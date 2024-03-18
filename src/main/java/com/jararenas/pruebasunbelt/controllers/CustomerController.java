@@ -117,31 +117,6 @@ public class CustomerController {
 		}
 	}
 	
-	/**
-	* Otra versión del método getCustomerByDoc(@RequestBody Customer customer)
-	* Prueba realizada para revisar posible compactación del código para "dismminuir" la "verbosidad"
-	* @param customer recibe dos valores de tipos String, uno con el tipo de documento y el otro con el documento 
-	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
-	* y otro con los resultados
-	* @author Andrés Jaramillo / Sunbelt
-	* @version 0.6, 06/03/2024
-	*/
-	@PostMapping("getCustomerByDocument")
-	public ResponseEntity<Response> getCustomerByDocument(@RequestBody Customer customer){
-		try {
-			Optional<Response> verification = service.verifyData(customer);
-			if(!verification.isEmpty()) 
-				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
-			List<Customer> res = service.getCustomersByDocument(customer);
-			if(res.isEmpty()) 
-				return new ResponseEntity<>(new Response("No se encontraron clientes", null), HttpStatus.NOT_FOUND);
-			return new ResponseEntity<>(new Response("OK", res), HttpStatus.OK);
-		}
-		catch(Exception ex) {
-			return new ResponseEntity<>(new Response(ex.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
 	
 	
 	
