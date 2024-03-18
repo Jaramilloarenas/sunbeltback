@@ -69,7 +69,7 @@ class CustomerControllerTest {
 		/*************************************caso de prueba*****************************************/
 		Customer customer = new Customer();
 		response = customerController.getCustomerByDoc(customer);
-		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		/*************************************caso de prueba*****************************************/
 		customer.setTypeDoc("c");
 		customer.setDocument("10121314");
