@@ -44,6 +44,9 @@ import com.jararenas.pruebasunbelt.services.IDataService;
 		
 	}
 	
+	/**
+	 * Método que realiza la consulta con los argumentos proporcionados 
+	 */
 	public List<Customer> getCustomerByDoc(Customer cus){
 		return this.customers.stream().filter(x -> x.getDocument().equals(cus.getDocument()) 
 				&& x.getTypeDoc().equals(cus.getTypeDoc().toLowerCase())).toList();

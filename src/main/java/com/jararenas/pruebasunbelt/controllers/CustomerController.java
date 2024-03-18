@@ -48,6 +48,33 @@ public class CustomerController {
 		return "Verificado";
 	}
 	
+	/**
+	* Otra versión del método getCustomerByDoc(@RequestBody Customer customer)
+	* Refactorización para mejorar legibilidad del código y hacer una mejor separación de responsabilidades, se creo un nuevo método que realiza las verificaciones de los parametros
+	* y retorna un opctional
+	* @param customer recibe dos valores de tipos String, uno con el tipo de documento y el otro con el documento 
+	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
+	* y otro con los resultados
+	* @author Andrés Jaramillo / Sunbelt
+	* @version 1, 06/03/2024
+	*/
+	@CrossOrigin
+	@PostMapping("getCustomerById")
+	public ResponseEntity<Response> getCustomerById(@RequestBody Customer customer){
+		logger.info("initial call good");
+		try {
+			Optional<Response> verification = service.verifyData(customer);
+			if(!verification.isEmpty())
+				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
+			Response response = service.getCustomersByDoc(customer);
+			logger.info("getCustomerById Completed");
+			return new ResponseEntity<>(response, response.getCustomers().isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK );
+		}
+		catch(Exception ex) {
+			logger.error("Error", ex);
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
 	/**
 	* Método expuesto para ser consumido por el método post para obtener los clientes con un determinado documento
@@ -55,7 +82,7 @@ public class CustomerController {
 	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
 	* y otro con los resultados
 	* @author Andrés Jaramillo / Sunbelt
-	* @version 0.1, 06/03/2024
+	* @version 0.8, 06/03/2024
 	*/
 	@CrossOrigin
 	@PostMapping("getCustomerByDoc")
@@ -79,7 +106,7 @@ public class CustomerController {
 				response.setCustomers(null);
 				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 			}
-			logger.info("Request completed");
+			logger.info("getCustomerByDoc request completed");
 			return new ResponseEntity<>(new Response("OK", res), HttpStatus.OK);
 		}
 		catch(Exception ex) {
@@ -92,44 +119,12 @@ public class CustomerController {
 	
 	/**
 	* Otra versión del método getCustomerByDoc(@RequestBody Customer customer)
-	* prueba para mejorar la legibilidad del código, se creo un nuevo método que realiza las verificaciones de los parametros
-	* y retorna un opctional
+	* Prueba realizada para revisar posible compactación del código para "dismminuir" la "verbosidad"
 	* @param customer recibe dos valores de tipos String, uno con el tipo de documento y el otro con el documento 
 	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
 	* y otro con los resultados
 	* @author Andrés Jaramillo / Sunbelt
-	* @version 0.2, 06/03/2024
-	*/
-	@CrossOrigin
-	@PostMapping("getCustomerById")
-	public ResponseEntity<?> getCustomerById(@RequestBody Customer customer){
-		logger.debug("the method getCustomerByDoc() has been initialized");
-		Response response = new Response(); 
-		try {
-			Optional<Response> verification = service.verifyData(customer);
-			if(!verification.isEmpty()) 
-				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
-			response = service.getCustomersByDoc(customer);
-			if(response.getCustomers().isEmpty())
-				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-			logger.info("Request completed");
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
-		catch(Exception ex) {
-			logger.error("ex.getMessage()", ex);
-			return new ResponseEntity<>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
-	
-	/**
-	* Otra versión del método getCustomerByDoc(@RequestBody Customer customer)
-	* Una prueba para revisar que tanto podía compactar el código para "dismminuir" la "verbosidad"
-	* @param customer recibe dos valores de tipos String, uno con el tipo de documento y el otro con el documento 
-	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
-	* y otro con los resultados
-	* @author Andrés Jaramillo / Sunbelt
-	* @version 1, 06/03/2024
+	* @version 0.6, 06/03/2024
 	*/
 	@PostMapping("getCustomerByDocument")
 	public ResponseEntity<Response> getCustomerByDocument(@RequestBody Customer customer){
