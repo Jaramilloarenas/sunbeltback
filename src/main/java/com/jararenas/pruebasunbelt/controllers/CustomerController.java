@@ -1,6 +1,7 @@
 package com.jararenas.pruebasunbelt.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class CustomerController {
 	*/
 	@GetMapping("/testing")
 	public String testing(){
-		System.out.println("Verificando si la aplicación inicia en el puerto indicado");
+		logger.debug("Verificando si la aplicación inicia en el puerto indicado");
 		return "Verificado";
 	}
 	
@@ -62,13 +63,12 @@ public class CustomerController {
 		logger.debug("the method getCustomerByDoc() has been initialized");
 		Response response = new Response(); 
 		try {
-			customer.setTypeDoc(customer.getTypeDoc().toLowerCase());
 			if(customer.getTypeDoc().isEmpty() || customer.getDocument().isEmpty()) {
 				response.setResponse("Los datos de consulta no estan completos");
 				logger.warn("The data received is not complete");
 				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 			}
-			if(!customer.getTypeDoc().equals("c") && !customer.getTypeDoc().equals("p")) {
+			if(!customer.getTypeDoc().equalsIgnoreCase("c") && !customer.getTypeDoc().equalsIgnoreCase("p")) {
 				logger.warn("The data received is not valid");
 				response.setResponse("El tipo de documento ingresado no es valido");
 				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -90,8 +90,40 @@ public class CustomerController {
 		}
 	}
 	
-	////@CrossOrigin(origins = http://localhost:9001 @RequestParam(required = false, defaultValue = "World")
-	//@RequestMapping(method = RequestMethod.GET, path = "/{id}")
+	/**
+	* Otra versión del método getCustomerByDoc(@RequestBody Customer customer)
+	* prueba para mejorar la legibilidad del código, se creo un nuevo método que realiza las verificaciones de los parametros
+	* y retorna un opctional
+	* @param customer recibe dos valores de tipos String, uno con el tipo de documento y el otro con el documento 
+	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
+	* y otro con los resultados
+	* @author Andrés Jaramillo / Sunbelt
+	* @version 0.1, 06/03/2024
+	*/
+	@CrossOrigin
+	@PostMapping("getCustomerById")
+	public ResponseEntity<Response> getCustomerById(@RequestBody Customer customer){
+		Response response = new Response(); 
+		try {
+			Optional<Response> verification = service.verifyData(customer);
+			if(!verification.isEmpty()) 
+				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
+			List<Customer> res = service.getCustomersByDocument(customer);
+			if(res.isEmpty()) {
+				response.setResponse("No se encontraron clientes con los datos proporcionados");
+				response.setCustomers(null);
+				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+			}
+			logger.info("Request completed");
+			return new ResponseEntity<>(new Response("OK", res), HttpStatus.OK);
+		}
+		catch(Exception ex) {
+			response.setResponse(ex.getMessage());
+			response.setCustomers(null);
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	
 	/**
 	* Otra versión del método getCustomerByDoc(@RequestBody Customer customer)
@@ -105,10 +137,9 @@ public class CustomerController {
 	@PostMapping("getCustomerByDocument")
 	public ResponseEntity<Response> getCustomerByDocument(@RequestBody Customer customer){
 		try {
-			customer.setTypeDoc(customer.getTypeDoc().toLowerCase());
 			if(customer.getTypeDoc().isEmpty() || customer.getDocument().isEmpty())
 				return new ResponseEntity<>(new Response("Los datos de consulta no estan completos", null), HttpStatus.BAD_REQUEST); 
-			if(!customer.getTypeDoc().equals("c") && !customer.getTypeDoc().equals("p"))
+			if(!customer.getTypeDoc().equalsIgnoreCase("c") && !customer.getTypeDoc().equalsIgnoreCase("p"))
 				return new ResponseEntity<>(new Response("El tipo de documento ingresado no es valido", null), HttpStatus.BAD_REQUEST); 
 			List<Customer> res = service.getCustomersByDocument(customer);
 			if(res.isEmpty())
@@ -120,9 +151,10 @@ public class CustomerController {
 		}
 	}
 	
-	/*HttpHeaders responseHeaders = new HttpHeaders();
-	   responseHeaders.setLocation(location);
-	   responseHeaders.set("MyResponseHeader", "MyValue");*/
+	
+	
+	
+
 	
 	
 	
