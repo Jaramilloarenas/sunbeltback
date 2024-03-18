@@ -33,6 +33,10 @@ public class CustomerController {
 	
 	private IRepositoryService service;
 	
+	public CustomerController(IRepositoryService service) {
+		this.service = service;
+	}
+	
 	/**
 	* Método de prueba de fácil acceso a traves de un cliente
 	* @author Andrés Jaramillo / Sunbelt
@@ -44,9 +48,6 @@ public class CustomerController {
 		return "Verificado";
 	}
 	
-	public CustomerController(IRepositoryService service) {
-		this.service = service;
-	}
 	
 	/**
 	* Método expuesto para ser consumido por el método post para obtener los clientes con un determinado documento
@@ -56,7 +57,6 @@ public class CustomerController {
 	* @author Andrés Jaramillo / Sunbelt
 	* @version 0.1, 06/03/2024
 	*/
-	
 	@CrossOrigin
 	@PostMapping("getCustomerByDoc")
 	public ResponseEntity<Response> getCustomerByDoc(@RequestBody Customer customer){
@@ -98,29 +98,26 @@ public class CustomerController {
 	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
 	* y otro con los resultados
 	* @author Andrés Jaramillo / Sunbelt
-	* @version 0.1, 06/03/2024
+	* @version 0.2, 06/03/2024
 	*/
 	@CrossOrigin
 	@PostMapping("getCustomerById")
-	public ResponseEntity<Response> getCustomerById(@RequestBody Customer customer){
+	public ResponseEntity<?> getCustomerById(@RequestBody Customer customer){
+		logger.debug("the method getCustomerByDoc() has been initialized");
 		Response response = new Response(); 
 		try {
 			Optional<Response> verification = service.verifyData(customer);
 			if(!verification.isEmpty()) 
 				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
-			List<Customer> res = service.getCustomersByDocument(customer);
-			if(res.isEmpty()) {
-				response.setResponse("No se encontraron clientes con los datos proporcionados");
-				response.setCustomers(null);
+			response = service.getCustomersByDoc(customer);
+			if(response.getCustomers().isEmpty())
 				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-			}
 			logger.info("Request completed");
-			return new ResponseEntity<>(new Response("OK", res), HttpStatus.OK);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 		catch(Exception ex) {
-			response.setResponse(ex.getMessage());
-			response.setCustomers(null);
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			logger.error("ex.getMessage()", ex);
+			return new ResponseEntity<>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
@@ -132,19 +129,18 @@ public class CustomerController {
 	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
 	* y otro con los resultados
 	* @author Andrés Jaramillo / Sunbelt
-	* @version 0.1, 06/03/2024
+	* @version 1, 06/03/2024
 	*/
 	@PostMapping("getCustomerByDocument")
 	public ResponseEntity<Response> getCustomerByDocument(@RequestBody Customer customer){
 		try {
-			if(customer.getTypeDoc().isEmpty() || customer.getDocument().isEmpty())
-				return new ResponseEntity<>(new Response("Los datos de consulta no estan completos", null), HttpStatus.BAD_REQUEST); 
-			if(!customer.getTypeDoc().equalsIgnoreCase("c") && !customer.getTypeDoc().equalsIgnoreCase("p"))
-				return new ResponseEntity<>(new Response("El tipo de documento ingresado no es valido", null), HttpStatus.BAD_REQUEST); 
+			Optional<Response> verification = service.verifyData(customer);
+			if(!verification.isEmpty()) 
+				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
 			List<Customer> res = service.getCustomersByDocument(customer);
-			if(res.isEmpty())
-				return new ResponseEntity<>(new Response("No se encontraron clientes con los datos proporcionados", null), HttpStatus.NOT_FOUND);
-			return new ResponseEntity<>(new Response("OK", null), HttpStatus.OK);
+			if(res.isEmpty()) 
+				return new ResponseEntity<>(new Response("No se encontraron clientes", null), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new Response("OK", res), HttpStatus.OK);
 		}
 		catch(Exception ex) {
 			return new ResponseEntity<>(new Response(ex.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);

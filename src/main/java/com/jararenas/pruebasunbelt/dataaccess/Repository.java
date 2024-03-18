@@ -3,6 +3,8 @@ package com.jararenas.pruebasunbelt.dataaccess;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jararenas.pruebasunbelt.models.Customer;
@@ -31,7 +33,15 @@ public class Repository implements IRepositoryService{
 		cus.setTypeDoc(cus.getTypeDoc().toLowerCase());
 		return data.getCustomerByDoc(cus);
 	}
-
+	
+	@Override
+	public Response getCustomersByDoc(Customer cus) {
+		cus.setTypeDoc(cus.getTypeDoc().toLowerCase());
+		List<Customer> res = data.getCustomerByDoc(cus);
+		if(res.isEmpty()) 
+			return new Response("No se encontraron clientes", null);
+		return new Response("OK", res);
+	}
 
 	public Optional<Response> verifyData(Customer cus) {
 		cus.setTypeDoc(cus.getTypeDoc().toLowerCase());

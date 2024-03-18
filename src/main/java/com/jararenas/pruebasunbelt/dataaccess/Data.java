@@ -1,7 +1,7 @@
 package com.jararenas.pruebasunbelt.dataaccess;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -18,10 +18,7 @@ import com.jararenas.pruebasunbelt.services.IDataService;
 @Service
  public class Data implements IDataService{
 	
-	//Attributes
 	private List<Customer> customers;
-
-	//setters and getters ///////////////////////////////
 	
 	public List<Customer> getCustomers() {
 		return customers;
@@ -30,8 +27,6 @@ import com.jararenas.pruebasunbelt.services.IDataService;
 	public void setCustomers(List<Customer> customers) {
 		this.customers = customers;
 	}
-
-	//Constructors///////////////////////////////
 
 	public Data() {
 		Customer customer = new Customer();
@@ -50,10 +45,16 @@ import com.jararenas.pruebasunbelt.services.IDataService;
 	}
 	
 	public List<Customer> getCustomerByDoc(Customer cus){
-		List<Customer> res = (List<Customer>) this.customers.stream().filter(x -> x.getDocument().equals(cus.getDocument()) 
-				&& x.getTypeDoc().equals(cus.getTypeDoc().toLowerCase())).collect(Collectors.toList());;
-		return res;
+		return this.customers.stream().filter(x -> x.getDocument().equals(cus.getDocument()) 
+				&& x.getTypeDoc().equals(cus.getTypeDoc().toLowerCase())).toList();
 	}
+	
+	public Optional<Customer> getCustomerByDocument(Customer cus){
+		return this.customers.stream().filter(x -> x.getDocument().equals(cus.getDocument()) 
+				&& x.getTypeDoc().equals(cus.getTypeDoc().toLowerCase())).findFirst();
+	}
+
+
 	
 	
 
