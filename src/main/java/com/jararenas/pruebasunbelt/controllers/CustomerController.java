@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +50,7 @@ public class CustomerController {
 	@CrossOrigin
 	@PostMapping("getCustomerById")
 	public ResponseEntity<?> getCustomerById(@RequestBody Customer customer){
-		logger.info("initial call good");
+		logger.info("initial call");
 		try {
 			Optional<Response> verification = service.verifyData(customer);
 			if(!verification.isEmpty())
@@ -65,30 +64,32 @@ public class CustomerController {
 		}
 	}
 	
-	
 	/**
 	 * Solo pruebas, posibilidad
 	 * @param customer
 	 * @return
 	 */
 	@CrossOrigin
-	@PostMapping("getCustomer")
-	public ResponseEntity<Response> getCustomer(@RequestBody Customer customer){
+	@PostMapping("getCustomerV2")
+	public ResponseEntity<String> getCustomerV2(@RequestBody Customer customer){
 		logger.info("initial call good");
 		try {
 			Optional<Response> verification = service.verifyData(customer);
 			if(!verification.isEmpty())
-				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(verification.get().getResponse(), HttpStatus.BAD_REQUEST);
 			Response response = service.getCustomersByDoc(customer);
-			return new ResponseEntity<>(response, response.getCustomers().isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK );
+			if(response.getCustomers().isEmpty())
+				return new ResponseEntity<>(response.getResponse(), HttpStatus.NOT_FOUND );
+			return new ResponseEntity<>(response.getResponse() + response.getCustomers().toString(), HttpStatus.OK);
 		}
 		catch(Exception ex) {
 			logger.error("Error ", ex);
-			return new ResponseEntity<>(new Response(ex.getMessage(), new ArrayList<>()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
 	/**
+	* @deprecated
 	* Método expuesto para ser consumido por el método post para obtener los clientes con un determinado documento
 	* @param customer recibe dos valores de tipos String, uno con el tipo de documento y el otro con el documento 
 	* @return Retorna un objeto con dos atributos, unos de tipos String para mostrar un mensaje acerca del resultado de la ejeución
@@ -96,6 +97,7 @@ public class CustomerController {
 	* @author Andrés Jaramillo / Sunbelt
 	* @version 0.8, 06/03/2024
 	*/
+	@Deprecated(since="0.8", forRemoval=true)
 	@CrossOrigin
 	@PostMapping("getCustomerByDoc")
 	public ResponseEntity<Response> getCustomerByDoc(@RequestBody Customer customer){
