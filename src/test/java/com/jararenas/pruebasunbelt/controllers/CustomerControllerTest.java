@@ -22,37 +22,42 @@ class CustomerControllerTest {
 	void setup() {
 	}
 	
+	/**
+	 * Casos de prueba para el método 
+	 * getCustomerById en CustomerController
+	 */
 	@Test
+	@SuppressWarnings("unchecked")
 	void testGetCustomerById(){
 		ResponseEntity<Response> response;
 		/*************************************caso de prueba*****************************************/
 		Customer customer = new Customer();
-		response = customerController.getCustomerById(customer);
+		response = (ResponseEntity<Response>) customerController.getCustomerById(customer);
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 		/*************************************caso de prueba*****************************************/
 		customer.setTypeDoc("c");
 		customer.setDocument("10121314");
-		response = customerController.getCustomerById(customer);
+		response = (ResponseEntity<Response>) customerController.getCustomerById(customer);
 		Assertions.assertEquals("OK", response.getBody().getResponse());
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		/*************************************caso de prueba*****************************************/
 		customer.setTypeDoc("t");
-		response = customerController.getCustomerById(customer);
+		response = (ResponseEntity<Response>) customerController.getCustomerById(customer);
 		Assertions.assertEquals("El tipo de documento ingresado no es valido", response.getBody().getResponse());
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		/*************************************caso de prueba*****************************************/
 		customer.setTypeDoc("p");
-		response = customerController.getCustomerById(customer);
+		response = (ResponseEntity<Response>) customerController.getCustomerById(customer);
 		Assertions.assertEquals("No se encontraron clientes", response.getBody().getResponse());
 		Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		/*************************************caso de prueba*****************************************/
 		customer.setTypeDoc("");
-		response = customerController.getCustomerById(customer);
+		response = (ResponseEntity<Response>) customerController.getCustomerById(customer);
 		Assertions.assertEquals("Los datos de consulta no estan completos", response.getBody().getResponse());
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		/*************************************caso de prueba*****************************************/
 		customer.setDocument("");
-		response = customerController.getCustomerById(customer);
+		response = (ResponseEntity<Response>) customerController.getCustomerById(customer);
 		Assertions.assertEquals("Los datos de consulta no estan completos", response.getBody().getResponse());
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		
@@ -91,13 +96,6 @@ class CustomerControllerTest {
 		response = customerController.getCustomerByDoc(customer);
 		Assertions.assertEquals("Los datos de consulta no estan completos", response.getBody().getResponse());
 		Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-	}
-	
-	
-	
-	@Test
-	void testTesting() {
-		Assertions.assertEquals("Verificado", customerController.testing());
 	}
 
 }

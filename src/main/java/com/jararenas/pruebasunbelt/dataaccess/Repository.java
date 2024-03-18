@@ -34,7 +34,6 @@ public class Repository implements IRepositoryService{
 	@Override
 	public List<Customer> getCustomersByDocument(Customer cus) {
 		logger.info("at the beggining to getCustomersByDocument on Repository class");
-		cus.setTypeDoc(cus.getTypeDoc().toLowerCase());
 		return data.getCustomerByDoc(cus);
 	}
 	
@@ -49,7 +48,6 @@ public class Repository implements IRepositoryService{
 	@Override
 	public Response getCustomersByDoc(Customer cus) {
 		logger.info("at the beggining to getCustomersByDoc on Repository class");
-		cus.setTypeDoc(cus.getTypeDoc().toLowerCase());
 		List<Customer> res = data.getCustomerByDoc(cus);
 		if(res.isEmpty()) 
 			return new Response("No se encontraron clientes", res);
@@ -66,7 +64,6 @@ public class Repository implements IRepositoryService{
 	public Optional<Response> verifyData(Customer cus) {
 		if(cus.getTypeDoc().isEmpty() || cus.getDocument().isEmpty())
 			return Optional.of(new Response("Los datos de consulta no estan completos", new ArrayList<>()));
-		cus.setTypeDoc(cus.getTypeDoc().toLowerCase());
 		if(!cus.getTypeDoc().equalsIgnoreCase("c") && !cus.getTypeDoc().equalsIgnoreCase("p")) 
 			return Optional.of(new Response("El tipo de documento ingresado no es valido", new ArrayList<>()));
 		logger.info("call to verifyData on Repository class completed");

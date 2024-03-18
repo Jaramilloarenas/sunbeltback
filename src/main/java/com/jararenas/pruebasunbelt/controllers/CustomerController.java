@@ -1,5 +1,6 @@
 package com.jararenas.pruebasunbelt.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,17 +39,6 @@ public class CustomerController {
 	}
 	
 	/**
-	* Método de prueba de fácil acceso a traves de un cliente
-	* @author Andrés Jaramillo / Sunbelt
-	* @version 0.1, 06/03/2024
-	*/
-	@GetMapping("/testing")
-	public String testing(){
-		logger.debug("Verificando si la aplicación inicia en el puerto indicado");
-		return "Verificado";
-	}
-	
-	/**
 	* Otra versión del método getCustomerByDoc(@RequestBody Customer customer)
 	* Refactorización para mejorar legibilidad del código y hacer una mejor separación de responsabilidades, se creo un nuevo método que realiza las verificaciones de los parametros
 	* y retorna un opctional
@@ -60,19 +50,41 @@ public class CustomerController {
 	*/
 	@CrossOrigin
 	@PostMapping("getCustomerById")
-	public ResponseEntity<Response> getCustomerById(@RequestBody Customer customer){
+	public ResponseEntity<?> getCustomerById(@RequestBody Customer customer){
 		logger.info("initial call good");
 		try {
 			Optional<Response> verification = service.verifyData(customer);
 			if(!verification.isEmpty())
 				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
 			Response response = service.getCustomersByDoc(customer);
-			logger.info("getCustomerById Completed");
 			return new ResponseEntity<>(response, response.getCustomers().isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK );
 		}
 		catch(Exception ex) {
-			logger.error("Error", ex);
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			logger.error("Error ", ex);
+			return new ResponseEntity<>("Error" + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	/**
+	 * Solo pruebas, posibilidad
+	 * @param customer
+	 * @return
+	 */
+	@CrossOrigin
+	@PostMapping("getCustomer")
+	public ResponseEntity<Response> getCustomer(@RequestBody Customer customer){
+		logger.info("initial call good");
+		try {
+			Optional<Response> verification = service.verifyData(customer);
+			if(!verification.isEmpty())
+				return new ResponseEntity<>(verification.get(), HttpStatus.BAD_REQUEST);
+			Response response = service.getCustomersByDoc(customer);
+			return new ResponseEntity<>(response, response.getCustomers().isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK );
+		}
+		catch(Exception ex) {
+			logger.error("Error ", ex);
+			return new ResponseEntity<>(new Response(ex.getMessage(), new ArrayList<>()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
